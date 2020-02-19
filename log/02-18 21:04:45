@@ -1,0 +1,36 @@
+
+[INFO] renew_state 1
+[INFO] current_web: biblegateway.com
+[INFO] renew_state 1
+[INFO] renew_state 2
+[INFO] renew_state 3
+[INFO] set()False
+[STA] Bad!biblegateway.com
+[INFO] current_web: booking.com
+[INFO] renew_state 1
+[INFO] found state= at state 1
+[INFO] found state= at state 1
+[INFO] found state= at state 1
+[INFO] found state= at state 2
+[INFO] renew_state 3
+[INFO] found state= at state 3
+[INFO] found state= at state 3
+[INFO] {1, 2, 3}True
+[STA] Nice! booking.com
+[INFO] found state= at state 5
+[INFO] found state= at state 5
+[INFO] current_web: biblegateway.com
+[INFO] renew_state 1
+[INFO] current_web: booking.com
+[INFO] renew_state 1
+[INFO] current_web: biblegateway.com
+[INFO] renew_state 1
+[INFO] current_web: booking.com
+[INFO] renew_state 1
+[TLS] http://etsy.com/
+[INFO] current_web: etsy.com
+[INFO] renew_state 1
+[INFO] renew_state 2
+[INFO] renew_state 3
+[INFO] set()False
+[STA] Bad!etsy.com
