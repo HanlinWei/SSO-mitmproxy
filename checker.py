@@ -1,5 +1,6 @@
 import mitmproxy
 from urllib.parse import urlparse
+import re
 
 fb = "facebook.com"
 websites = [
@@ -66,7 +67,36 @@ def contain_state(flow: mitmproxy.http.HTTPFlow):
         return True
     return False
 
-def check_result(flow: mitmproxy.http.HTTPFlow):
+def contain_user_info(flow: mitmproxy.http.HTTPFlow):
+    content = flow.response.text
+    found = {}
     for word in user_info:
-        if flow.response.text.find(word) > -1:
+        result = []
+        indexes = find_all(content, word)
+        for i in indexes:
+            if i == 0:
+                if re.match("\W", content[i+len(word)]):
+                    continue
+            elif (i+len(word)) > (len(content)-1):
+                if re.match("\W", content[i-1]):
+                    continue
+            else:
+                if re.match("\W", content[i-1]) or re.match("\W", content[i+len(word)]):
+                    continue
+            result.append(i)
+        if result:
+            found[word] = result
+        
 
+
+# find all index of target in content
+def find_all(content, target):
+    result = []
+    index = content.find(target)
+    while index > -1:
+        result.append(index)
+        index = content.find(target, index+1)
+    return result
+
+# find a word in content, without alphabet, number, or _ nearby
+    

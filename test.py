@@ -9,8 +9,12 @@ print(parsed_result)
 if "*" in "*":
     print("123"[2])
 
-print(re.match("\W*"+"Ross"+"\W*", "Ross\"0Ross\" Ross"))
-
 pattern = re.compile('\W*Ross\W*')
 str = "Ross\"0Ross\" Ross"
 print(pattern.search(str))
+
+print(str.find("Ross", 1))
+
+print(re.match("\W*"+"Ross"+"\W*", "Ross\"0Ross\" Ross"))
+if re.match("\W", "-"):
+    print("666")
