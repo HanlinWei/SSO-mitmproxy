@@ -19,7 +19,7 @@ websites = [
     "test.xxx"
     ]
 
-user_info = ["Ross", "David", "ross", "david"]
+user_info = ["Ross", "David", "ross", "david", "rossdavid", "RossDavid"]
 email = "tobecontinue2019@outlook.com"
 
 def check_host(flow: mitmproxy.http.HTTPFlow):
@@ -67,28 +67,24 @@ def contain_state(flow: mitmproxy.http.HTTPFlow):
         return True
     return False
 
-def contain_user_info(flow: mitmproxy.http.HTTPFlow):
-    content = flow.response.text
+# find a word in content, without alphabet, number, or _ nearby
+def contain_user_info(content):
     found = {}
     for word in user_info:
         result = []
         indexes = find_all(content, word)
         for i in indexes:
-            if i == 0:
-                if re.match("\W", content[i+len(word)]):
+            if i == 0 and not re.match("\W", content[i+len(word)]):
                     continue
-            elif (i+len(word)) > (len(content)-1):
-                if re.match("\W", content[i-1]):
+            elif (i+len(word)) > (len(content)-1) and not re.match("\W", content[i-1]):
                     continue
-            else:
-                if re.match("\W", content[i-1]) or re.match("\W", content[i+len(word)]):
+            elif not re.match("\W", content[i-1]) or not re.match("\W", content[i+len(word)]):
                     continue
             result.append(i)
         if result:
             found[word] = result
+    return found
         
-
-
 # find all index of target in content
 def find_all(content, target):
     result = []
@@ -98,5 +94,4 @@ def find_all(content, target):
         index = content.find(target, index+1)
     return result
 
-# find a word in content, without alphabet, number, or _ nearby
     

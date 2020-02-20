@@ -1,5 +1,6 @@
 import time
 from urllib.parse import urlparse
+import logger
 
 """
 state
@@ -26,33 +27,38 @@ class State():
         self.have_state_para = set()
         self.state_para_checked = False
 
-    def set_state(self, new_state):
+    def set_state(self, new_state, logfile=None):
         self.state = new_state
         self.state_time = time.time()
+        if logfile:
+            logger.write_info(logfile, "set_state " + str(new_state))
 
-    def renew_state(self, flow):
+    def renew_state(self, flow, logfile=None):
         # 0 to 1
         if self.state == 0 and self.current_web in flow.request.host:
-            self.set_state(1)
+            self.set_state(1, logfile)
             return 1
         # 1 to 2
         if self.state == 1 and "facebook.com" in flow.request.host:
             path = urlparse(flow.request.pretty_url).path
             if "/dialog/oauth" in path or "/x/oauth" in path:
-                self.set_state(2)
+                self.set_state(2, logfile)
                 return 2
         # 2 to 3
         if self.state == 2 and self.current_web in flow.request.host:
-            self.set_state(3)
+            self.set_state(3, logfile)
             return 3
+        # 3 to 4
+        # realized in main.py
         return -1
 
-    def timeout(self):
-        if self.state != 4 and (time.time()-self.state_time) > 5:
+    def timeout(self, logfile=None):
+        if (time.time()-self.state_time) > 5:
             if self.state == 3:
-                self.set_state(5)
+                self.set_state(5, logfile)
             return True
-        return False
+        else:
+            return False
 
     def confirm_state_para(self):
         self.have_state_para.add(self.state)

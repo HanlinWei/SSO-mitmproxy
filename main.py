@@ -56,33 +56,39 @@ def response(flow: mitmproxy.http.HTTPFlow):
 
     # check state parameters in traffic
     global cur_state
+    # if the testing website change, reset c
     if host != cur_state.current_web and host:
         cur_state.set_current_web(host)
         logger.write_info(log_file, "current_web: " + cur_state.current_web)
 
-    if cur_state.state > 0 and checker.contain_state(flow):
-        if cur_state.renew_state(flow) != 2 and cur_state.state == 2:
-            pass
-        else:
-            cur_state.confirm_state_para()
-            logger.write_info(log_file, "found state= at state " + str(cur_state.state))
+    cur_state.renew_state(flow, log_file)
 
-    if cur_state.state > 2 and cur_state.timeout() and not cur_state.state_para_checked:
-        logger.write_info(log_file, str(cur_state.have_state_para) + str(cur_state.have_state_para=={1,2,3}))
+    # check if state parameters shown at after state 2 
+    if cur_state.state > 0 and cur_state.state < 4 and checker.contain_state(flow):
+        # if cur_state.renew_state(flow, log_file) != 2 and cur_state.state == 2:
+        #     pass
+        # else:
+        cur_state.confirm_state_para()
+        logger.write_info(log_file, "found state= at state " + str(cur_state.state))
+
+    # check if state parameters shown at after state 2
+    if cur_state.state > 2 and cur_state.timeout(log_file) and not cur_state.state_para_checked:
         if not cur_state.check_state_para():
             logger.write(log_file, \
-                "[STA] Bad!" + cur_state.current_web)
+                "[STA] NO! " + cur_state.current_web)
         else:
             logger.write(log_file, \
-                "[STA] Nice! " + cur_state.current_web)
+                "[STA] OK! " + cur_state.current_web)
 
-    new_state = cur_state.renew_state(flow)
-    if new_state > -1:
-        logger.write_info(log_file, "renew_state " + str(new_state))
-
+    # check if user info is shown, if so, login successfully
     if cur_state.state == 3:
-        pass
-
+        content = flow.response.text
+        keywords = checker.contain_user_info(content)
+        if keywords:
+            logger.write_info(log_file, "found user info: " + str(keywords.keys()) + "\n       URL: " + flow.request.pretty_url)
+            cur_state.set_state(4, log_file)
+        else:
+            cur_state.timeout(log_file)
     logger.info(host)
 
 def error(flow: mitmproxy.http.HTTPFlow):
