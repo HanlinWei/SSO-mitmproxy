@@ -29,23 +29,6 @@ def check_host(flow: mitmproxy.http.HTTPFlow):
             return site
     return ""
 
-def check_facebook(flow: mitmproxy.http.HTTPFlow):
-    host = flow.request.host
-    if "facebook.com" in host:
-        return host
-    return ""
-
-# check if the host's path contain keywords
-def check_host_path(flow: mitmproxy.http.HTTPFlow):
-    path = urlparse(flow.request.pretty_url).path
-    if path == "" or path == "/":
-        return True
-    keywords = ["account", "user", "login"]
-    for word in keywords:
-        if word in path:
-            return True
-    return False
-
 # functions below return True means there's a vulnerability or something missed
 
 def check_307(flow: mitmproxy.http.HTTPFlow):
@@ -67,24 +50,21 @@ def contain_state(flow: mitmproxy.http.HTTPFlow):
         if query.startswith("state=") and len(query) > 20:
             return True
     # state may in Location of cookies
-    if "Location" in flow.response.headers.keys():
-        queries = urlparse(flow.response.headers["Location"]).query.split("&")
+    if "Location" in flow.response.cookies.keys():
+        queries = urlparse(flow.response.cookies["Location"]).query.split("&")
         for query in queries:
             if query.startswith("state=") and len(query) > 20:
                 return True
     # state may in body
-    try:
-        if flow.request.text.find("&") > -1:
-            queries = flow.request.text.split("&")
-            for query in queries:
-                if query.startswith("state=") and len(query) > 20:
-                    return True
-        elif flow.request.text.find("{") > -1:
-            pass
-        elif flow.request.text.startswith("state=") and len(flow.request.text) > 20:
-            return True
-    except (ValueError, UnicodeDecodeError) as e:
+    if flow.request.text.find("&") > -1:
+        queries = flow.request.text.split("&")
+        for query in queries:
+            if query.startswith("state=") and len(query) > 20:
+                return True
+    elif flow.request.text.find("{") > -1:
         pass
+    elif flow.request.text.startswith("state=") and len(flow.request.text) > 20:
+        return True
     return False
 
 # find a word in content, without alphabet, number, or _ nearby

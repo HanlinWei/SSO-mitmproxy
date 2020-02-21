@@ -1,5 +1,5 @@
 import socket
-
+import requests
 from multiprocessing import Process
 
 
@@ -10,7 +10,7 @@ def handle_client(client_socket):
     request_data = client_socket.recv(1024)
     print("    URL:", str(request_data).split(" ")[1])
     # 构造响应数据
-    response_start_line = "HTTP/1.1 307 OK\r\n"
+    response_start_line = "HTTP/1.1 200 OK\r\n"
     response_headers = "Location: My server\r\n"
     response_body = "<h1>Python HTTP Test</h1>"
     response = response_start_line + response_headers + "\r\n" + response_body

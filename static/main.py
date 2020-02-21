@@ -4,11 +4,9 @@ import logger
 import checker
 import time
 from state import State
-import serialize
 
 log_file = "log/" + time.strftime('%m-%d %H:%M:%S',time.localtime(time.time()))
 cur_state = State("*")
-count = 0
 
 def http_connect(flow: mitmproxy.http.HTTPFlow):
     """
@@ -35,9 +33,6 @@ def request(flow: mitmproxy.http.HTTPFlow):
         if checker.check_TLS(flow):
             logger.write(log_file, \
                 "[TLS] " + flow.request.pretty_url)
-
-    if "test.xxx" in flow.request.pretty_url:
-        flow.request.url = flow.request.pretty_url + "/mod"
 
 
 def responseheaders(flow: mitmproxy.http.HTTPFlow):
@@ -94,13 +89,7 @@ def response(flow: mitmproxy.http.HTTPFlow):
             cur_state.set_state(4, log_file)
         else:
             cur_state.timeout(log_file)
-
-    global count
-    if cur_state.state > 1:
-    if (host and checker.check_host_path(flow)) or checker.check_facebook(flow):
-        serialize.writeBunchobj("Req/" + str(count) + "-" + str(cur_state.state), flow.request)
-        serialize.writeBunchobj("Res/" + str(count) + "-" + str(cur_state.state), flow.response)
-        count += 1
+    logger.info(host)
 
 def error(flow: mitmproxy.http.HTTPFlow):
     """

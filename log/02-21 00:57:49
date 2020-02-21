@@ -1,8 +1,0 @@
-
-[INFO] current_web: etsy.com
-[INFO] set_state 1
-[INFO] set_state 2
-[INFO] set_state 3
-[INFO] found user info: dict_keys(['ross'])
-       URL: https://www.etsy.com/
-[INFO] set_state 4

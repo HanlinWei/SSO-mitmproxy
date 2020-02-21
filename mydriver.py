@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import logging
+from selenium.webdriver.common.by import By
 
 # driver version: 78.0.3904.105
 # the driver version (78.0.3904.xxx) should be the same as the Chrome browser in your computer
@@ -23,13 +23,26 @@ def efficientChrome(test=True, dir=None):
 """
 wait for a specific element loading
 """
-def wait(driver, expected, timeout=4):
+def wait(driver, expected, timeout=10):
     try:
         WebDriverWait(driver, timeout).until(
             EC.presence_of_element_located(expected)
         )
     except Exception as e:
-        logging.error("[mybrowsers.wait] " + e.__str__())
+        print("[mybrowsers.wait] " + e.__str__())
+"""
+click an element by xpath
+"""
+def click_xpath(driver, xpath, timeout=10):
+    wait(driver, (By.XPATH, xpath), timeout)
+    driver.find_element_by_xpath(xpath).click()
+
+"""
+click an element by class name
+"""
+def click_class_name(driver, class_name, timeout=10):
+    wait(driver, (By.CLASS_NAME, class_name))
+    driver.find_element_by_class_name(class_name).click()
 
 """
 open a new tab in driver
