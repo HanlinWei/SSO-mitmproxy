@@ -9,10 +9,12 @@ from selenium.webdriver.common.by import By
 """
 an efficient way to open a browser instance
 """
-def efficientChrome(test=True, dir=None):
+def efficientChrome(test=True, dir=None, proxy=None):
     chrome_options = Options()
-    chrome_options.add_argument('--no-proxy-server')
-    # chrome_options.add_argument('--proxy-server=127.0.0.1:8080')
+    if not proxy:
+        chrome_options.add_argument('--no-proxy-server')
+    else:
+        chrome_options.add_argument('--proxy-server=' + proxy)
     if dir:
         chrome_options.add_argument("--user-data-dir=" + dir)
     if test:

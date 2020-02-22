@@ -16,4 +16,5 @@ for file in l:
 
 for req in reqs:
     url = urlparse(req.pretty_url)
-    print(url.netloc + url.path)
+    print(req.pretty_url)
+    print("\n*********************\n")

@@ -2,7 +2,7 @@ import mitmproxy
 from urllib.parse import urlparse
 
 # change the access_token or code in request's query
-# target should be access_token= or code=
+# target should be "access_token=" or "code="
 def csrf_request(flow: mitmproxy.http.HTTPFlow, target, new_value):
     queries = urlparse(flow.request.pretty_url).query.split("&")
     access_token = ""
@@ -16,3 +16,11 @@ def csrf_request(flow: mitmproxy.http.HTTPFlow, target, new_value):
         return flow.request.url
     else:
         return ""
+
+# extract access_token or code in request
+def extract_code(flow: mitmproxy.http.HTTPFlow, target):
+    queries = urlparse(flow.request.pretty_url).query.split("&")
+    for query in queries:
+        if query.startswith(target) and len(query) > 20:
+            return query.split(target)[1]
+    return ""

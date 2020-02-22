@@ -5,10 +5,13 @@ import checker
 import time
 from state import State
 import serialize
+import csrf
+import os
 
 log_file = "log/" + time.strftime('%m-%d %H:%M:%S',time.localtime(time.time()))
 cur_state = State("*")
 count = 0
+access_token = ""
 
 def http_connect(flow: mitmproxy.http.HTTPFlow):
     """
@@ -36,8 +39,30 @@ def request(flow: mitmproxy.http.HTTPFlow):
             logger.write(log_file, \
                 "[TLS] " + flow.request.pretty_url)
 
-    if "test.xxx" in flow.request.pretty_url:
-        flow.request.url = flow.request.pretty_url + "/mod"
+    if "test.xxx" in flow.request.host:
+        flow.kill()
+
+    # csrf
+    global access_token
+    target = "fb_access_token="
+    if target in flow.request.pretty_url:
+        if "longming" in flow.request.headers.keys():
+            access_token = csrf.extract_code(flow, target)
+            logger.write_info(log_file, "[TOKEN] " + access_token)
+            assert access_token
+            logger.write_file("RAM/access_token", access_token)
+            flow.kill()
+        else:
+            l = os.listdir('RAM')
+            while not l:
+                time.sleep(1)
+                l = os.listdir('RAM')
+            logger.write_info(log_file, "[ORIGIN TOKEN] " + csrf.extract_code(flow, target))
+            with open('RAM/'+l[0], 'r+') as f:
+                access_token = f.readlines()[0]
+            logger.write_info(log_file, "[CHANGE TOKEN] " + access_token)
+            assert access_token
+            assert csrf.csrf_request(flow, target, access_token)
 
 
 def responseheaders(flow: mitmproxy.http.HTTPFlow):
@@ -95,12 +120,17 @@ def response(flow: mitmproxy.http.HTTPFlow):
         else:
             cur_state.timeout(log_file)
 
+    # record important flow
     global count
     if cur_state.state > 1:
-    if (host and checker.check_host_path(flow)) or checker.check_facebook(flow):
-        serialize.writeBunchobj("Req/" + str(count) + "-" + str(cur_state.state), flow.request)
-        serialize.writeBunchobj("Res/" + str(count) + "-" + str(cur_state.state), flow.response)
-        count += 1
+        if (host and checker.check_host_path(flow)) or checker.check_facebook(flow):
+            if "longming" in flow.request.headers.keys():
+                serialize.writeBunchobj("Req2/" + str(count) + "-" + str(cur_state.state), flow.request)
+                serialize.writeBunchobj("Res2/" + str(count) + "-" + str(cur_state.state), flow.response)
+            else:
+                serialize.writeBunchobj("Req/" + str(count) + "-" + str(cur_state.state), flow.request)
+                serialize.writeBunchobj("Res/" + str(count) + "-" + str(cur_state.state), flow.response)
+            count += 1
 
 def error(flow: mitmproxy.http.HTTPFlow):
     """
