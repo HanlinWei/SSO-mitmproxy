@@ -21,6 +21,6 @@ mydriver.click_xpath(driver, "//*[@id=\"plus-welcome-modal\"]/div/div/div[1]/but
 mydriver.click_xpath(driver, "/html/body/header/nav/ul[2]/li/a/span[1]")
 mydriver.click_xpath(driver, "/html/body/header/nav/ul[2]/li/ul/li[4]/a")
 
-mydriver.click_xpath(driver2, "//*[@id=\"plus-welcome-modal\"]/div/div/div[1]/button")
-mydriver.click_xpath(driver2, "/html/body/header/nav/ul[2]/li/a/span[1]")
-mydriver.click_xpath(driver2, "/html/body/header/nav/ul[2]/li/ul/li[4]/a")
+# mydriver.click_xpath(driver2, "//*[@id=\"plus-welcome-modal\"]/div/div/div[1]/button")
+# mydriver.click_xpath(driver2, "/html/body/header/nav/ul[2]/li/a/span[1]")
+# mydriver.click_xpath(driver2, "/html/body/header/nav/ul[2]/li/ul/li[4]/a")

@@ -47,7 +47,8 @@ def request(flow: mitmproxy.http.HTTPFlow):
     target = "fb_access_token="
     if target in flow.request.pretty_url:
         if "longming" in flow.request.headers.keys():
-            access_token = csrf.extract_code(flow, target)
+            # access_token = csrf.extract_code(flow, target)
+            access_token = flow.request.pretty_url
             logger.write_info(log_file, "[TOKEN] " + access_token)
             assert access_token
             logger.write_file("RAM/access_token", access_token)
@@ -62,7 +63,8 @@ def request(flow: mitmproxy.http.HTTPFlow):
                 access_token = f.readlines()[0]
             logger.write_info(log_file, "[CHANGE TOKEN] " + access_token)
             assert access_token
-            assert csrf.csrf_request(flow, target, access_token)
+            # assert csrf.csrf_request(flow, target, access_token)
+            flow.request.url = access_token
 
 
 def responseheaders(flow: mitmproxy.http.HTTPFlow):
